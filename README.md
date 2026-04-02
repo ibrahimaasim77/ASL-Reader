@@ -2,6 +2,12 @@
 
 A real-time American Sign Language (ASL) translator built with Python, OpenCV, and MediaPipe. Detects hand gestures through your webcam and translates them into text and speech.
 
+## 🔴 Live Demo
+
+**[Try it here → asl-reader-mtptfb3inb6wszxd9vq4d2.streamlit.app](https://asl-reader-mtptfb3inb6wszxd9vq4d2.streamlit.app)**
+
+> Opens in your browser — no installation needed. Allow camera access and hold a sign for 1.2 seconds to register it.
+
 ---
 
 ## Features
