@@ -1,6 +1,13 @@
 # ASL Reader
 
-A real-time American Sign Language (ASL) translator built with Python, OpenCV, and MediaPipe. Detects hand gestures through your webcam and translates them into text and speech.
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![MediaPipe](https://img.shields.io/badge/MediaPipe-Hand%20Landmarker-green)
+![Streamlit](https://img.shields.io/badge/Streamlit-Live%20Demo-red?logo=streamlit)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+A real-time American Sign Language (ASL) translator built with Python, MediaPipe, and OpenCV. Detects hand gestures through your webcam and translates them into text and speech — runs both locally and in the browser.
+
+---
 
 ## 🔴 Live Demo
 
@@ -12,26 +19,31 @@ A real-time American Sign Language (ASL) translator built with Python, OpenCV, a
 
 ## Features
 
-- Real-time hand landmark detection via MediaPipe (with skeleton overlay)
-- Recognizes **all 26 ASL letters** (A–Z) including motion-based J, Q, Z
-- Recognizes 7 common words/phrases
-- Text-to-speech output using pyttsx3
-- Hold-to-confirm gesture system (1.2s) to prevent accidental input
+- **Full A–Z alphabet** — all 26 ASL letters including motion-based J, Q, Z
+- **7 common words/phrases** — HELLO, YES, NO, PLEASE, THANKS, I LOVE YOU, STOP
+- Real-time hand landmark detection via MediaPipe with skeleton overlay
+- Hold-to-confirm system (1.2s) prevents accidental input
+- Landmark smoothing (EMA) for stable, jitter-free detection
+- Text-to-speech output (local app)
 - On-screen sentence builder with clear and backspace
-- Landmark smoothing (EMA) for stable detection
 - Modular codebase — easy to extend
 
 ---
 
-## Requirements
+## Tech Stack
 
-- Python 3.10–3.12
-- A working webcam
-- macOS, Windows, or Linux
+| Tool | Purpose |
+|------|---------|
+| [MediaPipe](https://mediapipe.dev) | Hand landmark detection (21 points) |
+| [OpenCV](https://opencv.org) | Camera capture & frame processing |
+| [Streamlit](https://streamlit.io) | Web interface |
+| [streamlit-webrtc](https://github.com/whitphx/streamlit-webrtc) | Browser camera access |
+| [Pillow](https://pillow.readthedocs.io) | Frame drawing (web version) |
+| pyttsx3 | Text-to-speech (local version) |
 
 ---
 
-## Installation
+## Quick Start (Local)
 
 **1. Clone the repository**
 ```bash
@@ -57,19 +69,16 @@ curl -L -o hand_landmarker.task \
   https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
 ```
 
----
-
-## Running the App
-
+**5. Run**
 ```bash
 python3 main.py
 ```
 
-| Key     | Action               |
-|---------|----------------------|
-| `Q`     | Quit                 |
-| `SPACE` | Clear sentence       |
-| `DEL`   | Delete last character|
+| Key     | Action                |
+|---------|-----------------------|
+| `Q`     | Quit                  |
+| `SPACE` | Clear sentence        |
+| `DEL`   | Delete last character |
 
 Hold a gesture steady for **1.2 seconds** to register it.
 
@@ -77,28 +86,29 @@ Hold a gesture steady for **1.2 seconds** to register it.
 
 ## Supported Gestures
 
-### Words
-| Gesture | Sign |
-|---------|------|
-| HELLO | All 5 fingers open, spread wide |
-| YES | Tight closed fist |
-| NO | Index and middle extended, close together |
-| PLEASE | Open hand, fingers close to thumb |
-| THANKS | Open hand, fingers moderately spread |
-| I_LOVE_YOU | Thumb, index, and pinky extended wide |
-| STOP | Four fingers up, thumb folded |
-
 ### Alphabet — All 26 Letters
 
 | Type | Letters |
 |------|---------|
 | Static pose | A B C D E F G H I K L M N O P R S T U V W X Y |
-| Motion-based | J Q Z |
+| Motion-based | **J** **Q** **Z** |
 
 **Motion letters** — hold the base shape and trace the stroke:
 - **J** — Hold I (pinky up), draw a J curve downward then hook left
-- **Q** — Hold a G shape pointing down, move hand downward
-- **Z** — Hold index finger pointing, trace Z (right → down-left → right)
+- **Q** — Hold G shape pointing down, move hand downward
+- **Z** — Hold index pointing, trace Z (right → down-left → right)
+
+### Words & Phrases
+
+| Sign | Gesture |
+|------|---------|
+| HELLO | All 5 fingers open, spread wide |
+| YES | Tight closed fist |
+| NO | Index and middle extended, close together |
+| PLEASE | Open hand, fingers close to thumb |
+| THANKS | Open hand, fingers moderately spread |
+| I LOVE YOU | Thumb, index, and pinky extended wide |
+| STOP | Four fingers up, thumb folded |
 
 ---
 
@@ -106,11 +116,12 @@ Hold a gesture steady for **1.2 seconds** to register it.
 
 ```
 ASL-Reader/
-├── main.py          # Entry point & main loop
+├── main.py          # Entry point & main loop (local)
+├── app.py           # Streamlit web app
 ├── config.py        # All constants and thresholds
 ├── camera.py        # Camera initialization & warmup
 ├── speech.py        # Text-to-speech wrapper
-├── ui.py            # OpenCV drawing functions
+├── ui.py            # Drawing functions
 └── gestures/
     ├── helpers.py   # fingers_up(), finger_angles(), landmark smoother
     ├── letters.py   # Static letter detection (A–Z minus J/Q/Z)
@@ -126,11 +137,10 @@ ASL-Reader/
 ```bash
 sudo killall VDCAssistant
 ```
-Then rerun. If it still hangs, restart your Mac.
 
 **`hand_landmarker.task` not found**
 
-Run the curl command in step 4 of Installation to download the model file.
+Run the `curl` command in step 4 above.
 
 ---
 
