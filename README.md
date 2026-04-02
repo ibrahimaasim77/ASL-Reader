@@ -7,12 +7,13 @@ A real-time American Sign Language (ASL) translator built with Python, OpenCV, a
 ## Features
 
 - Real-time hand landmark detection via MediaPipe (with skeleton overlay)
-- Recognizes all 26 ASL letters (A–Z) including motion-based J, Q, Z
+- Recognizes **all 26 ASL letters** (A–Z) including motion-based J, Q, Z
 - Recognizes 7 common words/phrases
 - Text-to-speech output using pyttsx3
 - Hold-to-confirm gesture system (1.2s) to prevent accidental input
-- On-screen sentence builder with clear and backspace functionality
-- Landmark smoothing for stable detection
+- On-screen sentence builder with clear and backspace
+- Landmark smoothing (EMA) for stable detection
+- Modular codebase — easy to extend
 
 ---
 
@@ -45,8 +46,10 @@ pip install opencv-python mediapipe numpy pyttsx3
 ```
 
 **4. Download the MediaPipe hand landmark model**
-
-Download `hand_landmarker.task` from the [MediaPipe releases page](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker) and place it in the project root.
+```bash
+curl -L -o hand_landmarker.task \
+  https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
+```
 
 ---
 
@@ -56,11 +59,11 @@ Download `hand_landmarker.task` from the [MediaPipe releases page](https://devel
 python3 main.py
 ```
 
-| Key     | Action          |
-|---------|-----------------|
-| `Q`     | Quit            |
-| `SPACE` | Clear sentence  |
-| `DEL`   | Delete last character |
+| Key     | Action               |
+|---------|----------------------|
+| `Q`     | Quit                 |
+| `SPACE` | Clear sentence       |
+| `DEL`   | Delete last character|
 
 Hold a gesture steady for **1.2 seconds** to register it.
 
@@ -73,23 +76,23 @@ Hold a gesture steady for **1.2 seconds** to register it.
 |---------|------|
 | HELLO | All 5 fingers open, spread wide |
 | YES | Tight closed fist |
-| NO | Index and middle fingers extended, close together |
+| NO | Index and middle extended, close together |
 | PLEASE | Open hand, fingers close to thumb |
 | THANKS | Open hand, fingers moderately spread |
 | I_LOVE_YOU | Thumb, index, and pinky extended wide |
 | STOP | Four fingers up, thumb folded |
 
-### Alphabet
-**A–Z** — all 26 letters supported.
+### Alphabet — All 26 Letters
 
-| Static letters | Motion-based |
-|---------------|-------------|
-| A B C D E F G H I K L M N O P R S T U V W X Y | J Q Z |
+| Type | Letters |
+|------|---------|
+| Static pose | A B C D E F G H I K L M N O P R S T U V W X Y |
+| Motion-based | J Q Z |
 
-J, Q, and Z are detected by tracking finger movement trajectories:
-- **J** — Hold the I shape (pinky up), then trace a J curve downward and hook left
-- **Q** — Hold a G shape pointing down, then move the hand downward
-- **Z** — Hold index finger pointing, then trace a Z stroke (right → down-left → right)
+**Motion letters** — hold the base shape and trace the stroke:
+- **J** — Hold I (pinky up), draw a J curve downward then hook left
+- **Q** — Hold a G shape pointing down, move hand downward
+- **Z** — Hold index finger pointing, trace Z (right → down-left → right)
 
 ---
 
@@ -97,16 +100,16 @@ J, Q, and Z are detected by tracking finger movement trajectories:
 
 ```
 ASL-Reader/
-├── main.py          # Entry point
+├── main.py          # Entry point & main loop
 ├── config.py        # All constants and thresholds
-├── camera.py        # Camera initialization
+├── camera.py        # Camera initialization & warmup
 ├── speech.py        # Text-to-speech wrapper
 ├── ui.py            # OpenCV drawing functions
 └── gestures/
     ├── helpers.py   # fingers_up(), finger_angles(), landmark smoother
     ├── letters.py   # Static letter detection (A–Z minus J/Q/Z)
     ├── words.py     # Word/phrase detection
-    └── dynamic.py   # Motion-based letter detection (J, Q, Z)
+    └── dynamic.py   # Motion-based detection (J, Q, Z)
 ```
 
 ---
@@ -118,6 +121,10 @@ ASL-Reader/
 sudo killall VDCAssistant
 ```
 Then rerun. If it still hangs, restart your Mac.
+
+**`hand_landmarker.task` not found**
+
+Run the curl command in step 4 of Installation to download the model file.
 
 ---
 
