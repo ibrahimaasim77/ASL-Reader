@@ -1,3 +1,11 @@
+import sys
+from unittest.mock import MagicMock
+
+# mediapipe imports cv2 only for drawing utils we never use.
+# Mocking it prevents the libGL.so.1 error on headless servers.
+if "cv2" not in sys.modules:
+    sys.modules["cv2"] = MagicMock()
+
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration
 import av
